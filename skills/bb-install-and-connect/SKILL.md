@@ -8,7 +8,7 @@ metadata:
 ---
 # Connect an agent to Backbencher Brain (`bb`)
 
-`npm install -g backbencher-brain` puts the binary on the machine, but it does **not**
+`npm install -g @backbencher/brain` puts the binary on the machine, but it does **not**
 register the MCP server in any agent host, and it does not install these skills. Three
 separate layers make an agent actually able to use bb:
 

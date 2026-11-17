@@ -15,7 +15,7 @@ text. Route the question first, then read the evidence block (`bb-evidence-readi
 
 | the question | call | notes |
 | --- | --- | --- |
-| exact symbol, its source, a file, lexical hits | `bb_search` | `mode: symbols` (default), `symbol`, `content`, `file`; `exact`, `caseSensitive`, `language`, `symbolKind` |
+| exact symbol, its source, a file, lexical hits | `bb_search` | Use `query` in `symbols` (default) or `content` mode, `symbolName` in `symbol` mode, and `filePath` in `file` mode. |
 | a behaviour/natural-language question | `bb_ask` | exact-name route for a symbol name, else semantic matches with cosine scores; similarity is not proof |
 | who calls X / what X calls | `bb_graph` | `direction`, `maxDepth`, `relationshipTypes`; typed edges with evidence tier |
 | what breaks if X changes | `bb_impact` | reverse dependencies with a declared node budget and depth |
