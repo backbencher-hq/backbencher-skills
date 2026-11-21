@@ -36,9 +36,30 @@ install. `--dry-run` prints what it would do. Re-run `install` after upgrading t
 the copies.
 
 The MCP server itself is registered in the host's own config — `bb mcp --dir <project>`
-is the server command; `docs/MCP_CLI_INDEXER_GUIDE.md` in the brain repository carries the
-per-host snippets for Claude Desktop/Code, VS Code and Cursor. `bb-install-and-connect`
+is the server command. Per-host snippets for Claude Desktop/Code, VS Code and Cursor are at
+<https://backbencher.cc/editors> (and in the brain repository as
+`docs/MCP_CLI_INDEXER_GUIDE.md`, which is NOT part of the published package — only
+`docs/indexing/`, `docs/tools/`, `docs/data/` and `docs/man/` ship). `bb-install-and-connect`
 walks an agent through that and through confirming the tools are visible.
+
+## Where the authoritative answers live
+
+A skill is a starting point. The installed binary and the published guide are the complete
+truth, and an agent should retrieve from them instead of guessing — this is the difference
+between a skill that ages badly and one that stays correct, because a flag list duplicated
+in prose goes stale while `--help` cannot.
+
+| surface | answers | why it beats the skill |
+| --- | --- | --- |
+| `bb help` / `bb <command> --help` | every command and its exact flags | generated from the installed version, so it is never stale, works offline |
+| `man bb` | the full manual | offline, section-addressable, ships in the package |
+| <https://backbencher.cc/docs> | the guide: installation, first index, how the index works, what gets indexed, keeping it fresh, embeddings setup, agent tools, MCP server, CLI reference, data & upgrades, troubleshooting | the long-form explanation the skills deliberately do not repeat |
+| `docs/indexing/` in the package | flag semantics, resume, performance, troubleshooting, embeddings | ships with the install, so it is readable on the user's own disk |
+| <https://github.com/backbencher-hq/backbencher-brain> | source, issues, the Agent report form | where a defect actually gets fixed |
+
+Every `SKILL.md` ends with a short version of this table, because an agent loads one skill
+and never sees this README. The skills name the retrieval path; they do not restate the
+reference, so a `bb` release does not require editing nine skill files.
 
 ## CLI quick reference
 

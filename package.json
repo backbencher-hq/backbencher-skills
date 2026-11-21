@@ -1,6 +1,6 @@
 {
   "name": "@backbencher/skills",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Agent skills for Backbencher Brain (bb): when to use which bb tool, how to read its evidence, and how to edit safely.",
   "license": "MIT",
   "type": "module",
@@ -33,5 +33,10 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "scripts": {
+    "check": "node bin/bb-skills.mjs check",
+    "verify": "node bin/bb-skills.mjs verify --dir ./.bb-skills-verify",
+    "test": "node bin/bb-skills.mjs check"
   }
 }

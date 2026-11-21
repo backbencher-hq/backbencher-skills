@@ -40,6 +40,7 @@ function usage(exitCode = 0) {
 Usage:
   bb-skills install [options]      copy every skill into a host skills directory
   bb-skills verify [options]       check an installed directory against this package
+  bb-skills check                  check the skill SOURCES in this package (CI)
   bb-skills list                   list the skills in this package
   bb-skills --help | --version
 
@@ -139,6 +140,67 @@ function install(o) {
   }
   return 0
 }
+/**
+ * Check the SKILL SOURCES in this package.
+ *
+ * `verify` checks an INSTALLED directory; nothing checked the sources, which is how the
+ * skills drifted from the product: every skill described the tools but NONE named
+ * `bb help`, `man bb` or the published guide, and the README pointed at a document that is
+ * not in the npm package. A skill that only restates the product goes stale silently; a
+ * skill that names the RETRIEVAL path stays correct. This pins the retrieval path.
+ */
+function check() {
+  const failures = []
+  const names = skillNames()
+
+  // Every skill must carry the discovery block. An agent loads ONE skill and never sees
+  // the README, so a block present only in the README reaches nobody.
+  const REQUIRED = [
+    ["bb help", /`bb help`|bb <command> --help/],
+    ["man bb", /`man bb`/],
+    ["the published guide", /https:\/\/backbencher\.cc\/docs/],
+    ["the repository", /https:\/\/github\.com\/backbencher-hq\/backbencher-brain/],
+    ["bb doctor", /bb doctor/],
+  ]
+  for (const name of names) {
+    const file = join("skills", name, "SKILL.md")
+    if (!existsSync(file)) { failures.push(`${name}: SKILL.md missing`); continue }
+    const text = readFileSync(file, "utf8")
+    for (const [label, re] of REQUIRED) {
+      if (!re.test(text)) failures.push(`${name}: does not name ${label}`)
+    }
+    if (!/^description:\s*Use when/m.test(text)) failures.push(`${name}: description is not a "use when" line`)
+    // A doc path that does not ship reaches nobody: the package `files` list decides.
+    if (/docs\/MCP_CLI_INDEXER_GUIDE\.md/.test(text)) {
+      failures.push(`${name}: cites docs/MCP_CLI_INDEXER_GUIDE.md, which is not in the published package`)
+    }
+  }
+
+  // The README is the canonical reference; it must name the same surfaces.
+  const readme = readFileSync("README.md", "utf8")
+  for (const [label, re] of REQUIRED) {
+    if (!re.test(readme)) failures.push(`README.md: does not name ${label}`)
+  }
+  // Every tool the skills mention must be one of the 16 public tools.
+  const KNOWN = new Set(["bb_search", "bb_ask", "bb_health", "bb_patterns", "bb_security", "bb_visualize",
+    "bb_migrate", "bb_analyze", "bb_doc", "bb_edit", "bb_index", "bb_graph", "bb_impact",
+    "bb_cross_language", "bb_annotate", "bb_annotations"])
+  const cited = new Set()
+  for (const name of names) {
+    for (const m of readFileSync(join("skills", name, "SKILL.md"), "utf8").matchAll(/\bbb_[a-z_]+\b/g)) cited.add(m[0])
+  }
+  for (const tool of cited) if (!KNOWN.has(tool)) failures.push(`a skill cites an unknown tool: ${tool}`)
+
+  if (process.argv.includes("--json")) {
+    process.stdout.write(JSON.stringify({ skills: names.length, toolsCited: [...cited].sort(), failures, ok: failures.length === 0 }, null, 2) + "\n")
+  } else if (failures.length) {
+    for (const f of failures) process.stdout.write(`FAIL ${f}\n`)
+  } else {
+    process.stdout.write(`OK ${names.length} skills: discovery path, tool vocabulary and doc references check out\n`)
+  }
+  return failures.length ? 1 : 0
+}
+
 function verify(o) {
   const cwd = process.cwd()
   const target = resolveTarget(o, cwd)
@@ -179,5 +241,6 @@ if (cmd === "list") {
 }
 if (cmd === "install") process.exit(install(o))
 if (cmd === "verify") process.exit(verify(o))
+if (cmd === "check") process.exit(check())
 process.stderr.write(`bb-skills: unknown command '${cmd}'\n`)
 usage(2)

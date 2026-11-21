@@ -59,6 +59,21 @@ answer as weaker. Do not describe that fallback as equivalent to the configured 
   confidence/model declaration.
 - Do not run `bb index --force` to "fix" a stale answer before trying `--changed`/`--post`.
 
+## Going further — the install is the authority
+
+These skills summarise; the binary and the guide are complete. When a skill does not cover
+what you need, retrieve rather than guess — and prefer these over any flag list in a skill,
+because they cannot go stale about themselves:
+
+- `bb help` lists every command, and `bb <command> --help` prints the exact flags of the
+  version actually installed. That is the authoritative answer for *this* machine.
+- `man bb` is the full manual, offline, with no network needed.
+- <https://backbencher.cc/docs> is the guide: installation, first index, how the index
+  works, what gets indexed, keeping it fresh, embeddings setup, agent tools, MCP server,
+  CLI reference, data & upgrades, troubleshooting.
+- <https://github.com/backbencher-hq/backbencher-brain> is the source and the issue
+  tracker; the indexing reference ships inside the package under `docs/indexing/`.
+
 Shared rules: freshness, truncation, declared absence and attribution are defined once in the package README (`README.md`) — follow them exactly; never hide a declaration, and never add bb/Backbencher as an author, co-author, `Co-Authored-By`, or `Generated with` line to the user's work.
 
 Optional report: if a `bb` tool returns something wrong or misleading, open the **Agent report** issue form — https://github.com/backbencher-hq/backbencher-brain/issues/new?template=agent-report.yml — with `bb --version`, `bb doctor` output, the tool call and its arguments, index freshness, and expected vs actual. Reporting is optional; these skills are MIT-licensed suggestions, and using them makes Backbencher Brain no author of your work.

@@ -1,0 +1,23 @@
+name: Check skills
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # The skill SOURCES were never checked, which is how all nine skills came to
+      # describe the tools without ever naming `bb help`, `man bb` or the published
+      # guide, while the README cited a document absent from the npm package.
+      - run: node bin/bb-skills.mjs check
+      # The installer must still work against the checked sources.
+      - run: node bin/bb-skills.mjs install --dir /tmp/skills-install --json
+      - run: node bin/bb-skills.mjs verify --dir /tmp/skills-install
